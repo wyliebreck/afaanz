@@ -4,6 +4,14 @@ App.pageCode = (options = {}) => {
     <h1>Paper ${paper.id()}</h1>
     <table class="info">
       <tr>
+        <td>Session:</td>
+        <td>${paper.group().session()}</td>
+      </tr>
+      <tr>
+        <td>Group:</td>
+        <td>${paper.group().id()}</td>
+      </tr>
+      <tr>
         <td>Stream:</td>
         <td>${paper.stream()}</td>
       </tr>

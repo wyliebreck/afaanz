@@ -2,26 +2,18 @@ App.pageCode = (options = {}) => {
   let type = App.pageValue("type", options.type);
   let id = App.pageValue("id", options.id);
   let object;
-  let people;
+  let matches;
   let returnId;
   if (type === "discussant") {
     object  = new App.Paper(id);
-    people = {
-      strict: object.possibleDiscussants("strict"),
-      relaxed: object.possibleDiscussants("relaxed"),
-    };
+    matches = object.possibleDiscussants(),
     returnId = `p${id}`;
   }
   if (type === "chair") {
     object  = new App.Group(id);
-    people = {
-      strict: object.possibleChairs("strict"),
-      relaxed: object.possibleChairs("relaxed"),
-    };
+    matches = object.possibleChairs();
     returnId = `g${id}`;
   }
-  let strictIds = people.strict.map(person => person.id());
-  people.relaxed = people.relaxed.filter(person => !strictIds.includes(person.id())); 
   let html = `
     <h1>Find a ${type}</h1>
     <table class="info">
@@ -49,18 +41,19 @@ App.pageCode = (options = {}) => {
         <td></td>
       </tr>
   `;
-  for (let match of ["Strict", "Relaxed"]) {
-    for (let person of people[match.toLowerCase()]) {
-      html += `
-        <tr id="${person.id()}">
-          <td class="center"><div class="${match}">${match}</div></td>
-          <td class="left"><a onclick="App.getPage('pgPerson.js', {id: ${person.id()}, setBackTo: true})">${person.reverseName()}</a></td>
-          <td class="left">${person.institution()}<br>${person.position()}</td>
-          <td class="left">${(type === "discussant" ? person.discussantStreams() : person.chairStreams()).join("<br>")}</td>
-          <td><button onclick="App.page.assign(${person.id()})">Assign</button></td>
-        </tr>
-      `;
-    }
+  matches = matches.filter(match => match.level < 99);
+  matches.sort((a, b) => a.level - b.level);
+  for (let match of matches) {
+    let person = new App.Person(match.id);
+    html += `
+      <tr id="${person.id()}">
+        <td class="center"><div class="level l${match.level}">${match.level}</div></td>
+        <td class="left"><a onclick="App.getPage('pgPerson.js', {id: ${person.id()}, setBackTo: true})">${person.reverseName()}</a></td>
+        <td class="left">${person.institution()}<br>${person.position()}</td>
+        <td class="left">${(type === "discussant" ? person.discussantStreams() : person.chairStreams()).join("<br>")}</td>
+        <td><button onclick="App.page.assign(${person.id()})">Assign</button></td>
+      </tr>
+    `;
   }
   html += `</table>`;
   html += `
@@ -74,16 +67,13 @@ App.pageCode = (options = {}) => {
       padding: 2px 4px;
       min-width: auto;
     }
-    div.Strict {
-      background-color: green;
+    div.level {
       color: white;
       padding: 4px;
     }
-    div.Relaxed {
-      background-color: orange;
-      color: white;
-      padding: 4px;
-    }
+    div.l1 {background-color: #ffd700;}
+    div.l2 {background-color: #c0c0c0;}
+    div.l3 {background-color: #cd7f32;}
     table.info {
       margin: 1em auto;
       max-width: 40em;

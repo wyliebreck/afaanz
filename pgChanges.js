@@ -30,7 +30,6 @@ App.pageCode = (options = {}) => {
   html += `</table>`;
   App.page.html = html;
   App.page.apply = (change, from, to) => {
-    //alert(`Change ${change} from ${from} to ${to}`);
     if (change === "stream") App.updateStream(from, to);
     if (change === "institution") App.updateInstitution(from, to);
     App.isDirty(true);

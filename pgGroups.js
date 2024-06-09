@@ -24,4 +24,7 @@ App.pageCode = (options = {}) => {
   }
   html += `</table>`;
   App.page.html = html;
+  App.page.css = `
+    main hr {border: thin lightgray solid}
+  `;
 };

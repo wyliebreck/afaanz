@@ -215,6 +215,7 @@
   td[dir="desc"]:after {
     content: "\2193";
   }
+  td.selected,
   tr.selected td {
     background-color: lemonchiffon;
   }
